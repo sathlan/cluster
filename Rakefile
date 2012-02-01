@@ -96,9 +96,9 @@ task :Rem_ip_linux do |t|
   `sudo ip a flush lagg2.101 2>/dev/null`
 end
 
-task_name_rem_ip = 'Rem_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'')
+task_name_rem_ip = 'Rem_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'').gsub(/-.*/,'')
 task_name_rem_ip = task_name_rem_ip.to_sym
-task_name_add_ip = 'Add_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'')
+task_name_add_ip = 'Add_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'').gsub(/-.*/,'')
 task_name_add_ip = task_name_add_ip.to_sym
 
 desc "Remove ips routers for your plateform"
