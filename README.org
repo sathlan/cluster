@@ -87,15 +87,11 @@ Here's a example for Debian.
 TODO: test http://deb.bearstech.com/squeeze/ruby-1.9.3/
 
 #+begin_src sh
-  wget http://download.virtualbox.org/virtualbox/4.1.8/virtualbox-4.1_4.1.8-75467~Debian~squeeze_amd64.deb
-  dpkg -i virtualbox-4.1_4.1.8-75467~Debian~squeeze_amd64.deb
-  
   sudo apt-get install ruby1.9.1
+  sudo apt-get install ruby1.9.1-dev
   sudo apt-get install ri1.9
   
   # required to get gem >= 1.8 the 1.3 does not work.
-  sudo env REALLY_GEM_UPDATE_SYSTEM=1 gem update --system 
-  
   sudo update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.1 500 \
                            --slave   /usr/share/man/man1/ruby.1.gz ruby.1.gz /usr/share/man/man1/ruby1.9.1.1.gz \
                            --slave   /usr/share/man/man1/ri.1.gz ri.1.gz /usr/share/man/man1/ri1.9.1.1.gz \
@@ -103,9 +99,16 @@ TODO: test http://deb.bearstech.com/squeeze/ruby-1.9.3/
                            --slave   /usr/share/man/man1/irb.1.gz irb.1.gz /usr/share/man/man1/irb1.9.1.1.gz \
                            --slave   /usr/bin/ri ri /usr/bin/ri1.9.1 \
                            --slave   /usr/bin/irb irb /usr/bin/irb1.9.1 \
+                           --slave   /usr/bin/gem gem /usr/bin/gem1.9.1 \
                            --slave   /usr/bin/rdoc rdoc /usr/bin/rdoc1.9.1
   
-  gem install bundler -v '~>1.0'
+  sudo env REALLY_GEM_UPDATE_SYSTEM=1 gem1.9.1 update --system 
+  
+  # must be greater than 1.8
+  gem --version
+  
+  sudo gem install bundler -v '~>1.0'
+  sudo gem install rake -v '~>0.9'
   
 #+end_src
 
@@ -115,22 +118,27 @@ You need a specific version.
 #+srcname: install_vagrant_1
 #+begin_src sh
   cd /usr/src
-  git clone --ref vendor/sathlan git://github.com/sathlan/vagrant.git
+  sudo git clone --branch vendor/sathlan git://github.com/sathlan/vagrant.git
   cd vagrant
   bundle install
   rake build
-  sudo gem install pkg/vagrant*.gem
+  sudo gem install pkg/vagrant-*.gem
 #+end_src
 
 *** Machine-nics
 
 #+begin_src sh
+  apt-get install sudo
+  # this step is very optional
+  adduser vagrant
+  # add sudo passwordless right to the user who spawn the vm
+  echo '%vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
   cd /usr/src
   git clone git://github.com/sathlan/machine-nics.git
   cd machine-nics
   bundle install
   rake build
-  sudo gem install pkg/machine-nics*.gem
+  sudo gem install pkg/machine-nics-*.gem
 
 #+end_src
 
@@ -138,12 +146,19 @@ You need a specific version.
 First we need the vagrant configuration and the associated rakefile (=
 makefile in ruby):
 #+begin_src sh
+  su - vagrant                  # or whatever user belonging to the
+                                # sudo nopasswd group
   cd ~/vps
   mkdir ~/cluster_ahealix
-  git clone git://github.com/sathlan/cluster.git
+  cd ~/cluster_ahealix
+  git clone git://github.com/sathlan/cluster.git .
 #+end_src
 
-Then we need some network on the host.
+We are done with dependencies.  Now we can spawn some vm. 
+
+*** Basic Usage
+
+First we need some network on the host.
 
 #+begin_src sh
   # list available network configuration
@@ -180,11 +195,11 @@ We can have virtualbox snapshot at the command line for free with
 [[https://github.com/t9md/vagrant-snap][vagrant-snap]].
 
 #+begin_src sh
+  sudo gem install virtualbox
   sudo gem install vagrant-snap
+  cd ~/vps/cluster_ahealix
+  vagrant snap take b1 -n 'before big change' -d "I'm about to break everything."  
 #+end_src
-
-All vm comes with a initial snapshot so you can always get back to
-this point if everything goes bad.
 
 
 ** Basic Puppet integrated.
@@ -196,4 +211,28 @@ hurting an new module.
 The basic setup is found in for each machine in the
 =manifests/<machine>.pp= file.
 
+** Problems
+*** Linux
+**** The network does not works
+Setting up all the interface with nicpromis allow-all into virtualbox
+seems to resolve the issue.  Seems related to
+https://www.virtualbox.org/ticket/4214.
+
+On the host:
+: VBoxManage list vms  
+: for i in 2 3 4 5 ; do VBoxManage modifyvm <uuid> --nicpromisc$i allow-all; done
+
+TODO: can be integrated to vagrant.
+
+**** The gateway does not work for the FW
+The setup has some glitch under Linux, but in the end everything works
+fine.
+
+To have the bond0.101 works on the fw1, the bond0 interface must be
+set promisc mode:
+
+: ifconfig bond0 promisc
+
+This seems also related to https://www.virtualbox.org/ticket/4214 and
+requires further investigation (or a puppet rule)
 
