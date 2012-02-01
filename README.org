@@ -1,0 +1,199 @@
+* Cluster Ahealix
+** Description
+The goal is to mimic a eNovance environment in order to improve the
+continuous integration of specific development and puppet recipe.
+
+The setup is based on [[http://www.virtualbox.org/][virtualbox]] driven by [[https://github.com/mitchellh/vagrant][vagrant]] and a specific
+development ([[https://github.com/sathlan/machine-nics][machine-nics]]) which setup the host virtual networking
+environment.
+
+The environment is composed of:
+ - a cluster ahaelix;
+ - a cluster of firewall;
+ - two machines providing mx and dns services
+ - a monitoring machine
+ - a puppet master
+
+
+ | Type       | machine   | ip              | service      | done |
+ |------------+-----------+-----------------+--------------+------|
+ | ahealix    | b1        | 172.143.115.36  | openvz       |      |
+ |            |           |                 | drbd         |      |
+ |            | b2        | 172.143.115.37  | openvz       |      |
+ |            |           |                 | drbd         |      |
+ |------------+-----------+-----------------+--------------+------|
+ | fw         | fw1       |                 | gateway      |      |
+ |            |           |                 | iptables     |      |
+ |            |           |                 | heartbeat1.3 |      |
+ |            |           |                 | pacemaker    |      |
+ |            | fw2       |                 | gateway      |      |
+ |            |           |                 | iptables     |      |
+ |            |           |                 | heartbeat1.3 |      |
+ |            |           |                 | pacemaker    |      |
+ |------------+-----------+-----------------+--------------+------|
+ | monitoring | mon_1     |                 | centreon     |      |
+ |            |           |                 | nagios       |      |
+ |            |           |                 | graph        |      |
+ |            | mon_2     |                 | centreon     |      |
+ |            |           |                 | nagios       |      |
+ |            |           |                 | graph        |      |
+ |------------+-----------+-----------------+--------------+------|
+ | mail/dns   | dns_mx_1  |                 | dns          |      |
+ |            |           |                 | mx           |      |
+ |            | dns_mx_2  |                 | dns          |      |
+ |            |           |                 | mx           |      |
+ |------------+-----------+-----------------+--------------+------|
+ | backup     | backup_1  |                 | backuppc     |      |
+ |            | backup_2  |                 | backuppc     |      |
+ |------------+-----------+-----------------+--------------+------|
+ | outsider   | outside_1 |                 | no service   |      |
+
+Eleven machines that create a realist production environment.  Network
+bond and vlan are working inside each vm to mimic even more the
+production.
+
+Not all machines need to be started for all need.  Only one firewall
+is required for the machine to get network connectivity.  After if you
+test a puppet/backup recipe, you need only:
+ - fw1;
+ - backup_1;
+ - backup_2;
+ - puppet;
+
+
+Each machine consume roughly 475M of memory, so make you math.
+
+** Setup
+*** VirtualBox
+A version above 4.0.0 is required.
+
+For mainstream Linux use the packages available [[https://www.virtualbox.org/wiki/Linux_Downloads][here]].
+
+For FreeBSD you can use [[http://redports.org/browser/virtualbox?rev=1481&order=name][redports virtualbox]].
+
+*** Ruby
+**** Requirements
+You need :
+ 1. a version of the [[http://www.ruby-lang.org/en/][ruby]] interpreter above 1.9
+ 2. a version of the [[http://rubygems.org/pages/download][RubyGem]] above 1.8
+ 3. a version of [[http://gembundler.com/][bundler]] above 1.0
+
+It is recommended to use native ruby tool for installation of the
+gem.
+
+Here's a example for Debian.
+
+**** Debian example
+TODO: test http://deb.bearstech.com/squeeze/ruby-1.9.3/
+
+#+begin_src sh
+  wget http://download.virtualbox.org/virtualbox/4.1.8/virtualbox-4.1_4.1.8-75467~Debian~squeeze_amd64.deb
+  dpkg -i virtualbox-4.1_4.1.8-75467~Debian~squeeze_amd64.deb
+  
+  sudo apt-get install ruby1.9.1
+  sudo apt-get install ri1.9
+  
+  # required to get gem >= 1.8 the 1.3 does not work.
+  sudo env REALLY_GEM_UPDATE_SYSTEM=1 gem update --system 
+  
+  sudo update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.1 500 \
+                           --slave   /usr/share/man/man1/ruby.1.gz ruby.1.gz /usr/share/man/man1/ruby1.9.1.1.gz \
+                           --slave   /usr/share/man/man1/ri.1.gz ri.1.gz /usr/share/man/man1/ri1.9.1.1.gz \
+                           --slave   /usr/share/man/man1/rdoc.1.gz rdoc.1.gz /usr/share/man/man1/rdoc1.9.1.1.gz \
+                           --slave   /usr/share/man/man1/irb.1.gz irb.1.gz /usr/share/man/man1/irb1.9.1.1.gz \
+                           --slave   /usr/bin/ri ri /usr/bin/ri1.9.1 \
+                           --slave   /usr/bin/irb irb /usr/bin/irb1.9.1 \
+                           --slave   /usr/bin/rdoc rdoc /usr/bin/rdoc1.9.1
+  
+  gem install bundler -v '~>1.0'
+  
+#+end_src
+
+*** Vagrant
+You need a specific version.
+
+#+srcname: install_vagrant_1
+#+begin_src sh
+  cd /usr/src
+  git clone --ref vendor/sathlan git://github.com/sathlan/vagrant.git
+  cd vagrant
+  bundle install
+  rake build
+  sudo gem install pkg/vagrant*.gem
+#+end_src
+
+*** Machine-nics
+
+#+begin_src sh
+  cd /usr/src
+  git clone git://github.com/sathlan/machine-nics.git
+  cd machine-nics
+  bundle install
+  rake build
+  sudo gem install pkg/machine-nics*.gem
+
+#+end_src
+
+*** cluster_healix
+First we need the vagrant configuration and the associated rakefile (=
+makefile in ruby):
+#+begin_src sh
+  cd ~/vps
+  mkdir ~/cluster_ahealix
+  git clone git://github.com/sathlan/cluster.git
+#+end_src
+
+Then we need some network on the host.
+
+#+begin_src sh
+  # list available network configuration
+  rake -T
+  # make one.
+  rake Add_eNovance_small
+  rake Add_ip
+
+#+end_src
+
+Here you'll have to make sure that everything which goes out is
+SNATed.
+
+Finally we start the virtual machines.  The first time is very long as
+it has to download the host (3.2G base PXE ahealix type server) and
+create an vm out of it.
+
+#+begin_src sh
+  vagrant up fw1
+  vagrant up b1
+  vagrant up puppet
+  
+#+end_src
+
+Done, now you can enjoy the environment.
+
+#+begin_src sh
+  vagrant help
+  vagrant ssh b1
+#+end_src
+
+*** Snapshots
+We can have virtualbox snapshot at the command line for free with
+[[https://github.com/t9md/vagrant-snap][vagrant-snap]].
+
+#+begin_src sh
+  sudo gem install vagrant-snap
+#+end_src
+
+All vm comes with a initial snapshot so you can always get back to
+this point if everything goes bad.
+
+
+** Basic Puppet integrated.
+Vagrant has puppet provisioning integrated.  Here, it's use to setup
+network connectivity.  Another use can be to quickly test an puppet
+module.  Coupled with snapshot, it enable the user to get test without
+hurting an new module.
+
+The basic setup is found in for each machine in the
+=manifests/<machine>.pp= file.
+
+
