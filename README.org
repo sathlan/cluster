@@ -213,7 +213,7 @@ The basic setup is found in for each machine in the
 
 ** Problems
 *** Linux
-**** The network does not works
+**** The network does not work
 Setting up all the interface with nicpromis allow-all into virtualbox
 seems to resolve the issue.  Seems related to
 https://www.virtualbox.org/ticket/4214.
