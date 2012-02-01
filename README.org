@@ -4,15 +4,16 @@ The goal is to mimic a eNovance environment in order to improve the
 continuous integration of specific development and puppet recipe.
 
 The setup is based on [[http://www.virtualbox.org/][virtualbox]] driven by [[https://github.com/mitchellh/vagrant][vagrant]] and a specific
-development ([[https://github.com/sathlan/machine-nics][machine-nics]]) which setup the host virtual networking
+development ([[https://github.com/sathlan/machine-nics][machine-nics]]) which setups the host virtual networking
 environment.
 
 The environment is composed of:
  - a cluster eHaelix;
  - a cluster of firewall;
- - two machines providing mx and dns services
- - a monitoring machine
- - a puppet master
+ - two machines providing mx and dns services;
+ - a monitoring machine;
+ - a puppet master;
+ - ...
 
 
  | Type       | machine   | ip              | service      | done |
@@ -52,7 +53,7 @@ Eleven machines that create a realist production environment.  Network
 bond and vlan are working inside each vm to mimic even more the
 production.
 
-Not all machines need to be started for all need.  Only one firewall
+Not all machines need to be started for all needs.  Only one firewall
 is required for the machine to get network connectivity.  After if you
 test a puppet/backup recipe, you need only:
  - fw1;
@@ -61,7 +62,9 @@ test a puppet/backup recipe, you need only:
  - puppet;
 
 
-Each machine consume roughly 475M of memory, so make you math.
+One machine consume roughly 475M of memory, but two machines do not
+make 950M.  It roughly stay (> 500M) the same with no load on the
+machine.  The maximum memory consumption is yet not know.  Try it.
 
 ** Setup
 *** VirtualBox
@@ -86,73 +89,63 @@ Here's a example for Debian.
 **** Debian example
 TODO: test http://deb.bearstech.com/squeeze/ruby-1.9.3/
 
-#+begin_src sh
-  sudo apt-get install ruby1.9.1
-  sudo apt-get install ruby1.9.1-dev
-  sudo apt-get install ri1.9
+:  sudo apt-get install ruby1.9.1
+:  sudo apt-get install ruby1.9.1-dev
+:  sudo apt-get install ri1.9
+:  
+:  # required to get gem >= 1.8 the 1.3 does not work.
+:  sudo update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.1 500 \
+:                           --slave   /usr/share/man/man1/ruby.1.gz ruby.1.gz /usr/share/man/man1/ruby1.9.1.1.gz \
+:                           --slave   /usr/share/man/man1/ri.1.gz ri.1.gz /usr/share/man/man1/ri1.9.1.1.gz \
+:                           --slave   /usr/share/man/man1/rdoc.1.gz rdoc.1.gz /usr/share/man/man1/rdoc1.9.1.1.gz \
+:                           --slave   /usr/share/man/man1/irb.1.gz irb.1.gz /usr/share/man/man1/irb1.9.1.1.gz \
+:                           --slave   /usr/bin/ri ri /usr/bin/ri1.9.1 \
+:                           --slave   /usr/bin/irb irb /usr/bin/irb1.9.1 \
+:                           --slave   /usr/bin/gem gem /usr/bin/gem1.9.1 \
+:                           --slave   /usr/bin/rdoc rdoc /usr/bin/rdoc1.9.1
+:  
+:  sudo env REALLY_GEM_UPDATE_SYSTEM=1 gem1.9.1 update --system 
+:  
+:  # must be greater than 1.8
+:  gem --version
+:  
+:  sudo gem install bundler -v '~>1.0'
+:  sudo gem install rake -v '~>0.9'
   
-  # required to get gem >= 1.8 the 1.3 does not work.
-  sudo update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.1 500 \
-                           --slave   /usr/share/man/man1/ruby.1.gz ruby.1.gz /usr/share/man/man1/ruby1.9.1.1.gz \
-                           --slave   /usr/share/man/man1/ri.1.gz ri.1.gz /usr/share/man/man1/ri1.9.1.1.gz \
-                           --slave   /usr/share/man/man1/rdoc.1.gz rdoc.1.gz /usr/share/man/man1/rdoc1.9.1.1.gz \
-                           --slave   /usr/share/man/man1/irb.1.gz irb.1.gz /usr/share/man/man1/irb1.9.1.1.gz \
-                           --slave   /usr/bin/ri ri /usr/bin/ri1.9.1 \
-                           --slave   /usr/bin/irb irb /usr/bin/irb1.9.1 \
-                           --slave   /usr/bin/gem gem /usr/bin/gem1.9.1 \
-                           --slave   /usr/bin/rdoc rdoc /usr/bin/rdoc1.9.1
-  
-  sudo env REALLY_GEM_UPDATE_SYSTEM=1 gem1.9.1 update --system 
-  
-  # must be greater than 1.8
-  gem --version
-  
-  sudo gem install bundler -v '~>1.0'
-  sudo gem install rake -v '~>0.9'
-  
-#+end_src
-
 *** Vagrant
 You need a specific version.
 
-#+srcname: install_vagrant_1
-#+begin_src sh
-  cd /usr/src
-  sudo git clone --branch vendor/sathlan git://github.com/sathlan/vagrant.git
-  cd vagrant
-  bundle install
-  rake build
-  sudo gem install pkg/vagrant-*.gem
-#+end_src
+:  cd /usr/src
+:  sudo git clone --branch vendor/sathlan git://github.com/sathlan/vagrant.git
+:  cd vagrant
+:  bundle install
+:  rake build
+:  sudo gem install pkg/vagrant-*.gem
 
 *** Machine-nics
 
-#+begin_src sh
-  apt-get install sudo
-  # this step is very optional
-  adduser vagrant
-  # add sudo passwordless right to the user who spawn the vm
-  echo '%vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
-  cd /usr/src
-  git clone git://github.com/sathlan/machine-nics.git
-  cd machine-nics
-  bundle install
-  rake build
-  sudo gem install pkg/machine-nics-*.gem
-
-#+end_src
+:  apt-get install sudo
+:  # this step is very optional
+:  adduser vagrant
+:  # add sudo passwordless right to the user who spawn the vm
+:  echo '%vagrant ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+:  cd /usr/src
+:  git clone git://github.com/sathlan/machine-nics.git
+:  cd machine-nics
+:  bundle install
+:  rake build
+:  sudo gem install pkg/machine-nics-*.gem
 
 *** cluster_healix
 First we need the vagrant configuration and the associated rakefile (=
 makefile in ruby):
-#+begin_src sh
-  su - vagrant                  # or whatever user belonging to the
-                                # sudo nopasswd group
-  cd ~/vps
-  mkdir ~/cluster_ehaelix
-  cd ~/cluster_ehaelix
-  git clone git://github.com/sathlan/cluster.git .
-#+end_src
+
+:  su - vagrant                  # or whatever user belonging to the
+:                                # sudo nopasswd group
+:  cd ~/vps
+:  mkdir ~/cluster_ehaelix
+:  cd ~/cluster_ehaelix
+:  git clone git://github.com/sathlan/cluster.git .
 
 We are done with dependencies.  Now we can spawn some vm. 
 
@@ -160,14 +153,10 @@ We are done with dependencies.  Now we can spawn some vm.
 
 First we need some network on the host.
 
-#+begin_src sh
-  # list available network configuration
-  rake -T
-  # make one.
-  rake Add_eNovance_small
-  rake Add_ip
-
-#+end_src
+:  # list available network configuration
+:  rake -T
+:  # make one.
+:  rake Add_eNovance_small
 
 Here you'll have to make sure that everything which goes out is
 SNATed.
@@ -176,31 +165,23 @@ Finally we start the virtual machines.  The first time is very long as
 it has to download the host (3.2G base PXE ehaelix type server) and
 create an vm out of it.
 
-#+begin_src sh
-  vagrant up fw1
-  vagrant up b1
-  vagrant up puppet
-  
-#+end_src
+:  vagrant up fw1
+:  vagrant up b1
+:  vagrant up puppet
 
 Done, now you can enjoy the environment.
 
-#+begin_src sh
-  vagrant help
-  vagrant ssh b1
-#+end_src
+:  vagrant help
+:  vagrant ssh b1
 
 *** Snapshots
 We can have virtualbox snapshot at the command line for free with
 [[https://github.com/t9md/vagrant-snap][vagrant-snap]].
 
-#+begin_src sh
-  sudo gem install virtualbox
-  sudo gem install vagrant-snap
-  cd ~/vps/cluster_ehaelix
-  vagrant snap take b1 -n 'before big change' -d "I'm about to break everything."  
-#+end_src
-
+:  sudo gem install virtualbox
+:  sudo gem install vagrant-snap
+:  cd ~/vps/cluster_ehaelix
+:  vagrant snap take b1 -n 'before big change' -d "I'm about to break everything."  
 
 ** Basic Puppet integrated.
 Vagrant has puppet provisioning integrated.  Here, it's use to setup
