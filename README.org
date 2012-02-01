@@ -1,4 +1,4 @@
-* Cluster Ahealix
+* Cluster eHaelix
 ** Description
 The goal is to mimic a eNovance environment in order to improve the
 continuous integration of specific development and puppet recipe.
@@ -8,7 +8,7 @@ development ([[https://github.com/sathlan/machine-nics][machine-nics]]) which se
 environment.
 
 The environment is composed of:
- - a cluster ahaelix;
+ - a cluster eHaelix;
  - a cluster of firewall;
  - two machines providing mx and dns services
  - a monitoring machine
@@ -17,7 +17,7 @@ The environment is composed of:
 
  | Type       | machine   | ip              | service      | done |
  |------------+-----------+-----------------+--------------+------|
- | ahealix    | b1        | 172.143.115.36  | openvz       |      |
+ | ehaelix    | b1        | 172.143.115.36  | openvz       |      |
  |            |           |                 | drbd         |      |
  |            | b2        | 172.143.115.37  | openvz       |      |
  |            |           |                 | drbd         |      |
@@ -149,8 +149,8 @@ makefile in ruby):
   su - vagrant                  # or whatever user belonging to the
                                 # sudo nopasswd group
   cd ~/vps
-  mkdir ~/cluster_ahealix
-  cd ~/cluster_ahealix
+  mkdir ~/cluster_ehaelix
+  cd ~/cluster_ehaelix
   git clone git://github.com/sathlan/cluster.git .
 #+end_src
 
@@ -173,7 +173,7 @@ Here you'll have to make sure that everything which goes out is
 SNATed.
 
 Finally we start the virtual machines.  The first time is very long as
-it has to download the host (3.2G base PXE ahealix type server) and
+it has to download the host (3.2G base PXE ehaelix type server) and
 create an vm out of it.
 
 #+begin_src sh
@@ -197,7 +197,7 @@ We can have virtualbox snapshot at the command line for free with
 #+begin_src sh
   sudo gem install virtualbox
   sudo gem install vagrant-snap
-  cd ~/vps/cluster_ahealix
+  cd ~/vps/cluster_ehaelix
   vagrant snap take b1 -n 'before big change' -d "I'm about to break everything."  
 #+end_src
 
@@ -215,8 +215,7 @@ The basic setup is found in for each machine in the
 *** Linux
 **** The network does not work
 Setting up all the interface with nicpromis allow-all into virtualbox
-seems to resolve the issue.  Seems related to
-https://www.virtualbox.org/ticket/4214.
+seems to resolve the issue.  Seems related to [[https://www.virtualbox.org/ticket/4214][Ticket VituralBox 4214]].
 
 On the host:
 : VBoxManage list vms  
@@ -233,8 +232,8 @@ set promisc mode:
 
 : ifconfig bond0 promisc
 
-This seems also related to https://www.virtualbox.org/ticket/4214 and
-requires further investigation (or a puppet rule)
+This seems also related to [[https://www.virtualbox.org/ticket/4214][Ticket VituralBox 4214]] and requires further
+investigation (or a puppet rule)
 
 *** Common
 By default the vagrant link (with 10....) address is still there.  It
