@@ -94,6 +94,7 @@ task :Rem_ip_linux do |t|
   `sudo ip r del 172.143.114.192/27 via 172.143.112.71` # router cfg
   `sudo ip a flush lagg4.101 2>/dev/null`
   `sudo ip a flush lagg2.101 2>/dev/null`
+  `sudo sh -c 'if=$(ip r |awk "/default/{print \\$NF}");ip=$(ip a show $if | awk "/inet /{print \\$2}" | cut -d"/" -f1) ; iptables -D POSTROUTING -t nat -o $if \! -s $ip -j SNAT --to $ip'`
 end
 
 task_name_rem_ip = 'Rem_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'').gsub(/-.*/,'')
