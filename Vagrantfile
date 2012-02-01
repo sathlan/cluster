@@ -10,7 +10,7 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "b1"
-    config.vm.network :bridged, { nic_type: 'virtio', auto_config: false }
+    config.vm.network :bridged, { bridge: 'tap100', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap101', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap200', nic_type: 'virtio', auto_config: false }
     config.vm.provision :puppet do |puppet|
