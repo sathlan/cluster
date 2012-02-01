@@ -74,6 +74,11 @@ For mainstream Linux use the packages available [[https://www.virtualbox.org/wik
 
 For FreeBSD you can use [[http://redports.org/browser/virtualbox?rev=1481&order=name][redports virtualbox]].
 
+As a side note you need dkms on the host before installing virtualbox.
+
+: apt-get install dkms
+: /etc/init.d/virtualbox setup
+
 *** Ruby
 **** Requirements
 You need :
