@@ -75,7 +75,7 @@ task :Add_ip_linux do |t|
     `sudo ifconfig lagg2.101  172.143.112.67/26`
   end
   `sudo sysctl net.ipv4.ip_forward=1`
-  `sudo sh -c 'if=$(ip r |awk "/default/{print \$NF}");ip=$(ip a show eth0 | awk "/inet /{print \$2}" | cut -d"/" -f1) ; iptables -I POSTROUTING 1 -t nat -o $if \! -s $ip -j SNAT --to $ip'`
+  `sudo sh -c 'if=$(ip r |awk "/default/{print \\$NF}");ip=$(ip a show $if | awk "/inet /{print \\$2}" | cut -d"/" -f1) ; iptables -I POSTROUTING 1 -t nat -o $if \! -s $ip -j SNAT --to $ip'`
   `sudo ip r add 172.143.115.32/27 via 172.143.112.71` # router cfg
   `sudo ip r add 172.143.114.192/27 via 172.143.112.71` # router cfg
 end
