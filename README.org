@@ -236,3 +236,10 @@ set promisc mode:
 This seems also related to https://www.virtualbox.org/ticket/4214 and
 requires further investigation (or a puppet rule)
 
+*** Common
+By default the vagrant link (with 10....) address is still there.  It
+makes the command =vagrant ssh b1= work.  But it add a default route.
+This must be (manually) removed.
+
+TODO: A puppet rule to make it disappear.
+
