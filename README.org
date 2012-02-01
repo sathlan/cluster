@@ -209,6 +209,19 @@ On the host:
 
 TODO: can be integrated to vagrant.
 
+**** The network does not work - bis
+The ifenslave is required for the puppet network configuration I made.
+Unfortunately, it does not come by default with the ehaelix PXE setup.
+
+So :
+
+: apt-get update
+: apt-get install ifenslave
+: hostname | reboot
+
+TODO: include it in the default ehaelix image.
+TODO: make a rule in puppet.
+
 **** The gateway does not work for the FW
 The setup has some glitch under Linux, but in the end everything works
 fine.
