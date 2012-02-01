@@ -1,3 +1,4 @@
+require 'rbconfig'
 require 'machine-nics'
 require 'yaml'
 NET_CONFIGUATION = 'network.yml'
@@ -47,8 +48,8 @@ task Rem_blastors: [:clobber_nics_for_b1, :clobber_nics_for_b2]
 desc "Add cluster FW"
 task Add_fws: [:nics_fw1, :nics_fw2]
 
-desc "Add ips routers"
-task :Add_ip do |t|
+desc "Add ips routers for freebsd"
+task :Add_ip_freebsd do |t|
   if `ifconfig vlan101 2>/dev/null`.split.empty?
     `sudo ifconfig vlan10100  172.143.112.67/26`
   else
@@ -66,13 +67,45 @@ task :Add_ip do |t|
   `sudo route add 172.143.114.192/27 172.143.112.71` # router cfg
 end
 
-desc "Remove ips routers"
-task :Rem_ip do |t|
+desc "Add ips routers for linux"
+task :Add_ip_linux do |t|
+  if `ifconfig lagg2.101 2>/dev/null`.split.empty?
+    `sudo ifconfig lagg4.101  172.143.112.67/26`
+  else
+    `sudo ifconfig lagg2.101  172.143.112.67/26`
+  end
+  `sudo sysctl net.ipv4.ip_forward=1`
+  `sudo sh -c 'if=$(ip r |awk "/default/{print \$NF}");ip=$(ip a show eth0 | awk "/inet /{print \$2}" | cut -d"/" -f1) ; iptables -I POSTROUTING 1 -t nat -o $if \! -s $ip -j SNAT --to $ip'`
+  `sudo ip r add 172.143.115.32/27 via 172.143.112.71` # router cfg
+  `sudo ip r add 172.143.114.192/27 via 172.143.112.71` # router cfg
+end
+
+desc "Remove ips routers for freebsd"
+task :Rem_ip_freebsd do |t|
   `sudo route del 172.143.115.35/27  172.143.112.71` # router cfg
   `sudo route del 172.143.114.192/27 172.143.112.71` # router cfg
   `sudo ifconfig vlan10100 -alias 172.143.112.67 2>/dev/null`
   `sudo ifconfig vlan101   -alias 172.143.112.67 2>/dev/null`
 end
+
+desc "Remove ips routers for linux"
+task :Rem_ip_linux do |t|
+  `sudo ip r del 172.143.115.32/27 via 172.143.112.71` # router cfg
+  `sudo ip r del 172.143.114.192/27 via 172.143.112.71` # router cfg
+  `sudo ip a flush lagg4.101 2>/dev/null`
+  `sudo ip a flush lagg2.101 2>/dev/null`
+end
+
+task_name_rem_ip = 'Rem_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'')
+task_name_rem_ip = task_name_rem_ip.to_sym
+task_name_add_ip = 'Add_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'')
+task_name_add_ip = task_name_add_ip.to_sym
+
+desc "Remove ips routers for your plateform"
+task Rem_ip: [task_name_rem_ip]
+
+desc "Add ips routers for your plateform"
+task Add_ip: [task_name_add_ip]
 
 desc "Remove cluster FW"
 task Rem_fws: [:rem_nics_for_fw1, :rem_nics_for_fw2]
