@@ -51,6 +51,9 @@ Vagrant::Config.run do |config|
     config.vm.network :bridged, { bridge: 'tap110', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap111', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap112', nic_type: 'virtio', auto_config: false }
+    config.vm.provision :puppet do |puppet|
+      puppet.manifest_file = "fw2.pp"
+    end
   end
 
   config.vm.define :mon_1 do |config|
