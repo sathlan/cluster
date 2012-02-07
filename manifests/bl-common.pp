@@ -36,5 +36,6 @@ class vagrant::init::bl ($vlan3401_addr, $drbd_addr) {
                 "set iface[. = 'eth3']/address $drbd_addr",
                 "set iface[. = 'eth3']/netmask 255.255.255.0",
                 ],
+    before => Exec["networking"],
   }
 }

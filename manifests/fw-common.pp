@@ -42,5 +42,6 @@ class vagrant::init::fw ($ip_address, $vlan3401_address) {
                 "set iface[. = 'bond1.3401']/address $vlan3401_address",
                 "set iface[. = 'bond1.3401']/netmask 255.255.255.224",
                 ],
+    before => Exec["networking"],
   }
 }

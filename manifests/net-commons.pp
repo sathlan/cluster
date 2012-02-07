@@ -26,5 +26,3 @@ package { "ifupdown":
   ensure => installed,
   before => Exec["ip route del default dev eth0"]
 }
-# ifup, doesn't not really 'reload' conf.  Don't count too much on it.
-Augeas["bond_interfaces"] ~> Exec["networking"]
