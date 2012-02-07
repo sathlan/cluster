@@ -13,7 +13,7 @@ BRDG.each_key do |host|
     tree.traverse_df(tree.root, 0) do |nic, level|
       next if level <= 0
       actions.display('create', nic, level, tree.children[nic] )
-      actions.create!(nic, tree.children[nic])
+      actions.create!(nic, tree.children[nic], tree)
     end
   end
   desc "Destroy nics for #{host}"
