@@ -62,7 +62,7 @@ task :Add_ip_freebsd do |t|
   `sudo sysctl net.link.bridge.pfil_bridge=0`
   `sudo sysctl net.link.bridge.ipfw_arp=0`
   `sudo sysctl net.link.bridge.pfil_onlyip=0`
-  `sudo /etc/rc.d/pf restart`
+  `sudo /etc/rc.d/pf reload`
   `sudo route add 172.143.115.35/27  172.143.112.71` # router cfg
   `sudo route add 172.143.114.192/27 172.143.112.71` # router cfg
 end
