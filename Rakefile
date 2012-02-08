@@ -40,16 +40,16 @@ task clobber: [:Rem_ip] do |t|
 end
 
 desc "Add cluster ehaelix"
-task Add_blastors: [:nics_b1, :nics_b2]
+task add_blastors: [:nics_b1, :nics_b2]
 
 desc "Remove cluster ehaelix"
-task Rem_blastors: [:clobber_nics_for_b1, :clobber_nics_for_b2]
+task rem_blastors: [:rem_nics_for_b1, :rem_nics_for_b2]
 
 desc "Add cluster FW"
-task Add_fws: [:nics_fw1, :nics_fw2]
+task add_fws: [:nics_fw1, :nics_fw2]
 
 desc "Add ips routers for freebsd"
-task :Add_ip_freebsd do |t|
+task :add_ip_freebsd do |t|
   if `ifconfig vlan101 2>/dev/null`.split.empty?
     `sudo ifconfig vlan10100  172.143.112.67/26`
   else
@@ -68,7 +68,7 @@ task :Add_ip_freebsd do |t|
 end
 
 desc "Add ips routers for linux"
-task :Add_ip_linux do |t|
+task :add_ip_linux do |t|
   `sudo modprobe bonding 2>&1 >/dev/null; sudo modprobe 8021q 2>&1 >/dev/null;`
   # seems it cannot be on the laggX.101 interface.
   `sudo ifconfig bridge0 172.143.112.67/26`
@@ -79,7 +79,7 @@ task :Add_ip_linux do |t|
 end
 
 desc "Remove ips routers for freebsd"
-task :Rem_ip_freebsd do |t|
+task :rem_ip_freebsd do |t|
   `sudo route del 172.143.115.35/27  172.143.112.71` # router cfg
   `sudo route del 172.143.114.192/27 172.143.112.71` # router cfg
   `sudo ifconfig vlan10100 -alias 172.143.112.67 2>/dev/null`
@@ -87,7 +87,7 @@ task :Rem_ip_freebsd do |t|
 end
 
 desc "Remove ips routers for linux"
-task :Rem_ip_linux do |t|
+task :rem_ip_linux do |t|
   `sudo ip r del 172.143.115.32/27 via 172.143.112.71` # router cfg
   `sudo ip r del 172.143.114.192/27 via 172.143.112.71` # router cfg
   `sudo ip a flush lagg4.101 2>/dev/null`
@@ -101,23 +101,23 @@ task_name_add_ip = 'Add_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,''
 task_name_add_ip = task_name_add_ip.to_sym
 
 desc "Remove ips routers for your plateform"
-task Rem_ip: [task_name_rem_ip]
+task rem_ip: [task_name_rem_ip]
 
 desc "Add ips routers for your plateform"
-task Add_ip: [task_name_add_ip]
+task add_ip: [task_name_add_ip]
 
 desc "Remove cluster FW"
-task Rem_fws: [:rem_nics_for_fw1, :rem_nics_for_fw2]
+task rem_fws: [:rem_nics_for_fw1, :rem_nics_for_fw2]
 
 desc "Add eNovance"
-task Add_eNovance: [:Add_blastors, :Add_fws, :Add_ip]
+task add_enovance: [:add_blastors, :add_fws, :add_ip]
 
 desc "Add eNovance Small: fw1, b1, puppet"
-task Add_eNovance_small: [:nics_b1, :nics_fw1, :nics_puppet, :Add_ip ]
+task add_enovance_small: [:nics_b1, :nics_fw1, :nics_puppet, :add_ip ]
 
 desc "Remove eNovance Small: fw1, b1, puppet"
-task Rem_eNovance_small: [:rem_nics_for_b1, :rem_nics_for_fw1, :rem_nics_for_puppet, :Rem_ip ]
+task rem_enovance_small: [:rem_nics_for_b1, :rem_nics_for_fw1, :rem_nics_for_puppet, :rem_ip ]
 
 desc "Remove eNovance"
-task Rem_eNovance: [:Rem_ip, :Rem_fws, :Rem_blastors ]
+task rem_enovance: [:rem_ip, :rem_fws, :rem_blastors ]
 

@@ -161,7 +161,7 @@ First we need some network on the host.
 :  # list available network configuration
 :  rake -T
 :  # make one.
-:  rake Add_eNovance_small
+:  rake add_enovance_small
 
 Here you'll have to make sure that everything which goes out is
 SNATed.
