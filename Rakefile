@@ -27,7 +27,7 @@ BRDG.each_key do |host|
 end
 
 desc "Destroy everything."
-task clobber: [:Rem_ip] do |t|
+task clobber: [:rem_ip] do |t|
   BRDG.each_key do |host|
     tree = MachineNics::Tree.create_from_hash({host => BRDG[host]})
     actions = MachineNics::Actions.new(RbConfig::CONFIG['host_os'])
@@ -95,9 +95,9 @@ task :rem_ip_linux do |t|
   `sudo sh -c 'if=$(ip r |awk "/default/{print \\$NF}");ip=$(ip a show $if | awk "/inet /{print \\$2}" | cut -d"/" -f1) ; iptables -D POSTROUTING -t nat -o $if \! -s $ip -j SNAT --to $ip'`
 end
 
-task_name_rem_ip = 'Rem_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'').gsub(/-.*/,'')
+task_name_rem_ip = 'rem_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'').gsub(/-.*/,'')
 task_name_rem_ip = task_name_rem_ip.to_sym
-task_name_add_ip = 'Add_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'').gsub(/-.*/,'')
+task_name_add_ip = 'add_ip_' + RbConfig::CONFIG['host_os'].downcase.gsub(/\d/,'').gsub(/-.*/,'')
 task_name_add_ip = task_name_add_ip.to_sym
 
 desc "Remove ips routers for your plateform"
