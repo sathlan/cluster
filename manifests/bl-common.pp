@@ -14,7 +14,7 @@ class vagrant::init::bl ($vlan3401_addr, $drbd_addr) {
                 "set iface[. = 'bond0']/family inet",
                 "set iface[. = 'bond0']/method manual",
                 "set iface[. = 'bond0']/bond-slaves 'eth1 eth2'",
-                "set iface[. = 'bond0']/bound-mode balance-xor",
+                "set iface[. = 'bond0']/bond-mode balance-xor",
                 "set iface[. = 'bond0']/bond-miimon 100",
                 "set iface[. = 'bond0']/bond-downdelay 200",
                 "set iface[. = 'bond0']/bond-updelay 200",
