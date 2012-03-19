@@ -1,6 +1,16 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+def adjust_network(config)
+  [1, 2, 3, 4, 5, 6].each do |nic_nbr|
+    config.vm.customize ["modifyvm", :id, "--nicpromisc#{nic_nbr}", 'allow-all']
+  end
+end
+
+def adjust_vm_name(config)
+    config.vm.customize ["modifyvm", :id, "--name", config.vm.host_name + '-' + config.vm.box]
+end
+
 Vagrant::Config.run do |config|
   # All Vagrant configuration is done here. The most common configuration
   # options are documented and commented below. For a complete reference,
@@ -10,6 +20,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "b1"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap100', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap101', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap200', nic_type: 'virtio', auto_config: false }
@@ -22,6 +34,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "b2"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap102', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap103', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap201', nic_type: 'virtio', auto_config: false }
@@ -34,6 +48,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "fw1"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap104', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap105', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap106', nic_type: 'virtio', auto_config: false }
@@ -47,6 +63,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "fw2"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap109', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap110', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap111', nic_type: 'virtio', auto_config: false }
@@ -60,6 +78,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "mon-1"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap113', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap114', nic_type: 'virtio', auto_config: false }
   end
@@ -68,6 +88,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "mon-2"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap115', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap116', nic_type: 'virtio', auto_config: false }
   end
@@ -76,6 +98,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "dns-mx-1"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap117', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap118', nic_type: 'virtio', auto_config: false }
   end
@@ -84,6 +108,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "dns-mx-2"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap119', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap120', nic_type: 'virtio', auto_config: false }
   end
@@ -92,6 +118,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "backup-1"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap121', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap122', nic_type: 'virtio', auto_config: false }
   end
@@ -100,6 +128,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "backup-2"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap123', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap124', nic_type: 'virtio', auto_config: false }
   end
@@ -108,6 +138,8 @@ Vagrant::Config.run do |config|
     config.vm.box = "ehaelix-0.0.2"
     config.vm.box_url = "http://dev-2.lan.enovance.com/ehaelix-0.0.2.box"
     config.vm.host_name = "puppet"
+    adjust_vm_name(config)
+    adjust_network(config)
     config.vm.network :bridged, { bridge: 'tap125', nic_type: 'virtio', auto_config: false }
     config.vm.network :bridged, { bridge: 'tap126', nic_type: 'virtio', auto_config: false }
   end
