@@ -2,14 +2,14 @@
 :b1:
   :bridge0:
     :lagg7:
-    - :tap100_1496
-    - :tap101_1496
+    - :tap100
+    - :tap101
   :bridge1: :tap200
 :b2:
   :bridge0:
     :lagg1:
-    - :tap102_1496
-    - :tap103_1496
+    - :tap102
+    - :tap103
   :bridge1: :tap201
 :fw1:
   :bridge0:
@@ -18,8 +18,8 @@
       - :tap104
       - :tap105
     :lagg3:
-    - :tap106_1496
-    - :tap107_1496
+    - :tap106
+    - :tap107
 :fw2:
   :bridge0:
     :vlan10100:
@@ -27,40 +27,40 @@
       - :tap108
       - :tap109
     :lagg5:
-    - :tap110_1496
-    - :tap111_1496
+    - :tap110
+    - :tap111
 :puppet:
   :bridge0:
     :lagg12:
-    - :tap122_1496
-    - :tap123_1496
+    - :tap122
+    - :tap123
 :mon_1:
   :bridge0:
     :lagg8:
-    - :tap113_1496
-    - :tap114_1496
+    - :tap113
+    - :tap114
 :mon_2:
   :bridge0:
     :lagg9:
-    - :tap115_1496
-    - :tap116_1496
+    - :tap115
+    - :tap116
 :dns_mx_1:
   :bridge0:
     :lagg10:
-    - :tap117_1496
-    - :tap118_1496
+    - :tap117
+    - :tap118
 :dns_mx_2:
   :bridge0:
     :lagg11:
-    - :tap119_1496
-    - :tap120_1496
+    - :tap119
+    - :tap120
 :backup_1:
   :bridge0:
     :lagg12:
-    - :tap121_1496
-    - :tap122_1496
+    - :tap121
+    - :tap122
 :backup_2:
   :bridge0:
     :lagg13:
-    - :tap123_1496
-    - :tap124_1496
+    - :tap123
+    - :tap124
